@@ -1,0 +1,58 @@
+name: Firmware release
+
+on:
+  push:
+    tags:
+      - v*.*.*
+
+jobs:
+
+  build:
+    name: Build (${{ matrix.os }}-${{ matrix.arch }})
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [linux, windows]
+        arch: [arm64, amd64]
+
+    steps:
+      - name: Print GitHub context
+        run:  echo '${{ toJSON(github) }}'
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Building ${{ matrix.os }} ${{ matrix.arch }}
+        run: GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o husarnet-dds-${{ matrix.os }}-${{ matrix.arch }}
+
+      - name: list files
+        run: ls -la .
+
+      - name: Save build results
+        uses: actions/upload-artifact@v2
+        with:
+          path: husarnet-dds-${{ matrix.os }}-${{ matrix.arch }}
+
+
+  release:
+    name: Release
+    needs: build
+    if: success()
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/download-artifact@v2
+
+      - name: list files
+        run: tree
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            artifact/*
+          tag_name: ${{ github.ref_name}}
