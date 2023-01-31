@@ -10,8 +10,8 @@ Automatically generate the DDS configuration for Husarnet.
 RELEASE="v1.0.10"
 ARCH="amd64"
 
-curl -L https://github.com/husarnet/husarnet-dds/releases/download/$RELEASE/husarnet-dds-linux-$ARCH -o /usr/local/bin/husarnet-dds
-chmod +x /usr/local/bin/husarnet-dds
+sudo curl -L https://github.com/husarnet/husarnet-dds/releases/download/$RELEASE/husarnet-dds-linux-$ARCH -o /usr/local/bin/husarnet-dds
+sudo chmod +x /usr/local/bin/husarnet-dds
 ```
 
 ## Building
