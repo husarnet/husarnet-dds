@@ -102,7 +102,9 @@ func main_loop() {
 			cyclonedds_uri, ok := os.LookupEnv("CYCLONEDDS_URI")
 			if ok {
 				fmt.Println("CYCLONEDDS_URI:", cyclonedds_uri)
-				output_xml_path = strings.Split(cyclonedds_uri, "file://")[1]
+				if strings.Contains(cyclonedds_uri, "husarnet") {
+					output_xml_path = strings.Split(cyclonedds_uri, "file://")[1]
+				}
 			}
 		}
 
@@ -163,8 +165,11 @@ func main_loop() {
 			fastrtps_default_profiles_file, ok := os.LookupEnv("FASTRTPS_DEFAULT_PROFILES_FILE")
 			if ok {
 				fmt.Println("FASTRTPS_DEFAULT_PROFILES_FILE:", fastrtps_default_profiles_file)
-				output_xml_path = fastrtps_default_profiles_file
+				if strings.Contains(fastrtps_default_profiles_file, "husarnet") {
+					output_xml_path = fastrtps_default_profiles_file
+				}
 			}
+
 		}
 
 		// Create necessary directories
@@ -176,6 +181,7 @@ func main_loop() {
 		}
 
 		ioutil.WriteFile(output_xml_path, []byte(output_xml), 0644)
+		fmt.Printf("DDS config saved here: \"%s\"", output_xml_path)
 	} else {
 		fmt.Println("no hnet0 interface")
 		os.Exit(1)
