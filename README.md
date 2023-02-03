@@ -22,11 +22,15 @@ go build -o husarnet-dds
 
 ## Using
 
+> **warning**
+>
+> Target file name specified in `FASTRTPS_DEFAULT_PROFILES_FILE` or `CYCLONEDDS_URI` paths should contain 'husarnet' substring. Otherwise, the config will be saved under a default location.
+
 ### Fast DDS - simple discovery
 
 ```bash
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
-export FASTRTPS_DEFAULT_PROFILES_FILE=./test-fastdds-simple.xml
+export FASTRTPS_DEFAULT_PROFILES_FILE=./husarnet-fastdds-simple.xml
 husarnet-dds singleshot
 ```
 
@@ -51,7 +55,7 @@ fast-discovery-server -i 0 -x /var/tmp/husarnet-dds/fastdds-ds-server.xml
 
 ```bash
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
-export FASTRTPS_DEFAULT_PROFILES_FILE=./test-fastdds-ds-client.xml
+export FASTRTPS_DEFAULT_PROFILES_FILE=./husarnet-fastdds-ds-client.xml
 export ROS_DISCOVERY_SERVER=my-server:11811
 husarnet-dds singleshot
 ```
@@ -60,7 +64,7 @@ husarnet-dds singleshot
 
 ```bash
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-export CYCLONEDDS_URI=file://./test-cyclone.xml
+export CYCLONEDDS_URI=file://./husarnet-cyclone.xml
 husarnet-dds singleshot
 ```
 
@@ -73,7 +77,7 @@ You can run `husarnet-dds` in a service mode. It will start automatically after 
 
 ```bash
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
-export FASTRTPS_DEFAULT_PROFILES_FILE=/var/tmp/husarnet-dds/fastdds.xml
+export FASTRTPS_DEFAULT_PROFILES_FILE=/var/tmp/husarnet-dds/husarnet-fastdds.xml
 
 sudo husarnet-dds install $USER \
 -e RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION \
