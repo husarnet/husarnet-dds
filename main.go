@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -28,6 +29,7 @@ var dds_discovery_server_port string
 //go:embed dds-templates/fastdds-ds-server.xml
 //go:embed dds-templates/fastdds-ds-client.xml
 var f embed.FS
+var husarnet_temp_dir string
 
 func main_loop() {
 	default_config_cyclonedds_simple, _ := f.ReadFile("dds-templates/cyclonedds-simple.xml")
@@ -39,6 +41,17 @@ func main_loop() {
 		var output_xml string
 		var input_xml string
 		var output_xml_path string
+
+		fmt.Println("Temporary directory:", os.TempDir()+"/husarnet-dds")
+
+		myos := runtime.GOOS
+		fmt.Printf("Host OS: %s\n", myos)
+		switch myos {
+		case "linux":
+			husarnet_temp_dir = "/var/tmp/husarnet-dds"
+		default:
+			husarnet_temp_dir = os.TempDir() + "/husarnet-dds"
+		}
 
 		// Prepare a config for Discovery Server (server) in all cases
 		input_xml = string(default_config_fastdds_ds_server)
@@ -60,7 +73,8 @@ func main_loop() {
 		}
 
 		output_xml = strings.Replace(output_xml, "$DISCOVERY_SERVER_PORT", dds_discovery_server_port, -1)
-		output_xml_path = "/var/tmp/husarnet-dds/fastdds-ds-server.xml"
+
+		output_xml_path = husarnet_temp_dir + "/fastdds-ds-server.xml"
 
 		// Create necessary directories for Discovery Server (server) xml config
 		dir := filepath.Dir(output_xml_path)
@@ -96,7 +110,7 @@ func main_loop() {
 			output_xml = ParseCycloneDDSSimple(input_xml)
 
 			// defaul output path
-			output_xml_path = "/var/tmp/husarnet-dds/cyclonedds.xml"
+			output_xml_path = husarnet_temp_dir + "/husarnet-cyclonedds.xml"
 
 			// check whether env to set non-default path is set
 			cyclonedds_uri, ok := os.LookupEnv("CYCLONEDDS_URI")
@@ -159,7 +173,7 @@ func main_loop() {
 			}
 
 			// defaul output path
-			output_xml_path = "/var/tmp/husarnet-dds/fastdds.xml"
+			output_xml_path = husarnet_temp_dir + "/husarnet-fastdds.xml"
 
 			// check whether env to set non-default path is set
 			fastrtps_default_profiles_file, ok := os.LookupEnv("FASTRTPS_DEFAULT_PROFILES_FILE")
@@ -246,6 +260,7 @@ func Execute() {
 }
 
 func main() {
+
 	userName := "root"
 
 	prg := &program{}
@@ -310,7 +325,7 @@ func main() {
 	installCommand.Flags().StringArrayVarP(&envs, "env", "e",
 		[]string{
 			"RMW_IMPLEMENTATION=rmw_fastrtps_cpp",
-			"FASTRTPS_DEFAULT_PROFILES_FILE=/var/tmp/husarnet-dds/fastdds.xml"},
+			"FASTRTPS_DEFAULT_PROFILES_FILE=" + husarnet_temp_dir + "/fastdds.xml"},
 		"environment variables for the service")
 
 	uninstallCommand := &cobra.Command{
