@@ -42,8 +42,6 @@ func main_loop() {
 		var input_xml string
 		var output_xml_path string
 
-		fmt.Println("Temporary directory:", os.TempDir()+"/husarnet-dds")
-
 		myos := runtime.GOOS
 		fmt.Printf("Host OS: %s\n", myos)
 		switch myos {
@@ -52,6 +50,8 @@ func main_loop() {
 		default:
 			husarnet_temp_dir = os.TempDir() + "/husarnet-dds"
 		}
+
+		fmt.Println("Temporary directory:", husarnet_temp_dir)
 
 		// Prepare a config for Discovery Server (server) in all cases
 		input_xml = string(default_config_fastdds_ds_server)
