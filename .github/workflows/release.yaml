@@ -39,7 +39,7 @@ jobs:
       - name: Save build results
         uses: actions/upload-artifact@v2
         with:
-          path: husarnet-dds-${{ matrix.os }}-${{ matrix.arch }}
+          path: husarnet-dds-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.extension }}
 
 
   release:
