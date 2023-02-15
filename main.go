@@ -24,6 +24,8 @@ var template_path_fastdds_ds_client string
 var template_path_fastdds_ds_server string
 var dds_discovery_server_port string
 
+var version string = "unknown"
+
 //go:embed dds-templates/cyclonedds-simple.xml
 //go:embed dds-templates/fastdds-simple.xml
 //go:embed dds-templates/fastdds-ds-server.xml
@@ -93,7 +95,6 @@ func main_loop() {
 		} else {
 			fmt.Println("RMW_IMPLEMENTATION is not set.")
 			return
-			// os.Exit(1)
 		}
 
 		if rmw_implementation == "rmw_cyclonedds_cpp" {
@@ -197,7 +198,7 @@ func main_loop() {
 		ioutil.WriteFile(output_xml_path, []byte(output_xml), 0644)
 		fmt.Printf("DDS config saved here: \"%s\"", output_xml_path)
 	} else {
-		fmt.Println("no hnet0 interface")
+		fmt.Println("can't reach Husarnet client API")
 		os.Exit(1)
 	}
 }
@@ -229,11 +230,14 @@ var rootCmd = &cobra.Command{
 	Use:   "husarnet-dds",
 	Short: "Create DDS config for Husarnet automatically",
 	Long:  `Create DDS config for Husarnet automatically`,
-	Example: `husarnet-dds install $USER
-	husarnet-dds start
-	husarnet-dds stop
-	husarnet-dds uninstall`,
-	Version: "v1.0.0",
+	Example: `
+husarnet-dds singleshot
+husarnet-dds install $USER
+husarnet-dds start
+husarnet-dds stop
+husarnet-dds uninstall
+	`,
+	Version: version,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -389,8 +393,10 @@ func main() {
 	rootCmd.AddCommand(stopCommand)
 	rootCmd.AddCommand(daemonCommand)
 	rootCmd.AddCommand(singleShotCommand)
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
 	pcli.SetRepo("husarnet/husarnet-dds")
+	pcli.DisableUpdateChecking = true
 	pcli.SetRootCmd(rootCmd)
 	pcli.Setup()
 

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -14,13 +13,12 @@ import (
 )
 
 func HusarnetPresent() bool {
-	interfaces, _ := net.Interfaces()
-	for _, i := range interfaces {
-		if i.Name == "hnet0" {
-			return true
-		}
+	_, err := HusarnetAPIrequest("api/status")
+	if err != nil {
+		return false
 	}
-	return false
+
+	return true
 }
 
 type hostTable struct {
@@ -31,7 +29,7 @@ type hostTable struct {
 	} `json:"result"`
 }
 
-func HusarnetAPIrequest(endpoint string) []byte {
+func HusarnetAPIrequest(endpoint string) ([]byte, error) {
 	// create a new HTTP client
 	client := &http.Client{}
 
@@ -39,14 +37,14 @@ func HusarnetAPIrequest(endpoint string) []byte {
 	req, err := http.NewRequest("GET", "http://localhost:16216/"+endpoint, nil)
 	if err != nil {
 		fmt.Println("Error creating request:", err)
-		os.Exit(1)
+		return nil, err
 	}
 
 	// make the GET request
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Error making request:", err)
-		os.Exit(1)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -54,27 +52,29 @@ func HusarnetAPIrequest(endpoint string) []byte {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
-		os.Exit(1)
+		return nil, err
 	}
 
-	return body
+	return body, nil
 }
 
 func GetHostIPv6(hostname string) string {
-	body := HusarnetAPIrequest("api/status")
+	body, err := HusarnetAPIrequest("api/status")
+	if err != nil {
+		fmt.Println("Error reading api/status:", err)
+		os.Exit(1)
+	}
 
 	var data hostTable
 	if err := json.Unmarshal(body, &data); err != nil {
 		fmt.Printf("Error unmarshaling response: %v\r\n", err)
 		os.Exit(1)
-		return "error"
 	}
 
 	ipv6Address, ok := data.Result.HostTable[hostname]
 	if !ok {
 		fmt.Printf("Host not found: %s", hostname)
 		os.Exit(1)
-		return "error"
 	}
 
 	return ipv6Address
@@ -82,13 +82,16 @@ func GetHostIPv6(hostname string) string {
 
 func GetOwnHusarnetIPv6() string {
 
-	body := HusarnetAPIrequest("api/status")
+	body, err := HusarnetAPIrequest("api/status")
+	if err != nil {
+		fmt.Println("Error reading api/status:", err)
+		os.Exit(1)
+	}
 
 	var data hostTable
 	if err := json.Unmarshal(body, &data); err != nil {
 		fmt.Printf("Error unmarshaling response: %v\r\n", err)
 		os.Exit(1)
-		return "error"
 	}
 
 	ipv6Address := data.Result.LocalIPv6
@@ -99,13 +102,16 @@ func GetOwnHusarnetIPv6() string {
 
 func ParseCycloneDDSSimple(templateXML string) string {
 
-	body := HusarnetAPIrequest("api/status")
+	body, err := HusarnetAPIrequest("api/status")
+	if err != nil {
+		fmt.Println("Error reading api/status:", err)
+		os.Exit(1)
+	}
 
 	var data hostTable
 	if err := json.Unmarshal(body, &data); err != nil {
 		fmt.Printf("Error unmarshaling response: %v\r\n", err)
 		os.Exit(1)
-		return "error"
 	}
 
 	// Initialize an empty buffer to hold the output
@@ -134,13 +140,16 @@ func ParseCycloneDDSSimple(templateXML string) string {
 
 func ParseFastDDSSimple(templateXML string) string {
 
-	body := HusarnetAPIrequest("api/status")
+	body, err := HusarnetAPIrequest("api/status")
+	if err != nil {
+		fmt.Println("Error reading api/status:", err)
+		os.Exit(1)
+	}
 
 	var data hostTable
 	if err := json.Unmarshal(body, &data); err != nil {
 		fmt.Printf("Error unmarshaling response: %v\r\n", err)
 		os.Exit(1)
-		return "error"
 	}
 
 	// Initialize an empty buffer to hold the output
