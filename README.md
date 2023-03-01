@@ -28,10 +28,20 @@ go build -o husarnet-dds
 
 ### Fast DDS - simple discovery
 
+On Linux/MacOS, using bash:
+
 ```bash
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 export FASTRTPS_DEFAULT_PROFILES_FILE=./husarnet-fastdds-simple.xml
 husarnet-dds singleshot
+```
+
+On Windows, using PowerShell
+
+```shell
+$env:RMW_IMPLEMENTATION = 'rmw_fastrtps_cpp'
+$env:FASTRTPS_DEFAULT_PROFILES_FILE = '.\husarnet-fastdds-simple.xml'
+.\husarnet-dds.exe singleshot
 ```
 
 ### Fast DDS - discovery server
@@ -68,12 +78,13 @@ export CYCLONEDDS_URI=file://./husarnet-cyclone.xml
 husarnet-dds singleshot
 ```
 
-
 ## Launching `husarnet-dds` as a service
 
 You can run `husarnet-dds` in a service mode. It will start automatically after system reboot, and every 5 seconds it will update the hosts in DDS `.xml` profile files.
 
 ### Installing
+
+Unix-like systems, using bash:
 
 ```bash
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
@@ -81,6 +92,13 @@ export FASTRTPS_DEFAULT_PROFILES_FILE=/var/tmp/husarnet-dds/husarnet-fastdds.xml
 
 sudo husarnet-dds install $USER \
 -e RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION \
+-e FASTRTPS_DEFAULT_PROFILES_FILE=$FASTRTPS_DEFAULT_PROFILES_FILE
+```
+
+On Windows, using PowerShell as Administrator:
+
+```bash
+.\husarnet-dds.exe install LocalSystem -e RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION \
 -e FASTRTPS_DEFAULT_PROFILES_FILE=$FASTRTPS_DEFAULT_PROFILES_FILE
 ```
 
