@@ -51,7 +51,7 @@ Launching the discovery server:
 fast-discovery-server -i 0 -x /var/tmp/husarnet-dds/fastdds-ds-server.xml
 ```
 
-#### Device acting as a **CLINET**
+#### Device acting as a **CLIENT**
 
 ```bash
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
@@ -84,7 +84,7 @@ sudo husarnet-dds install $USER \
 -e FASTRTPS_DEFAULT_PROFILES_FILE=$FASTRTPS_DEFAULT_PROFILES_FILE
 ```
 
-Available environtment variables
+Available environment variables
 
 | key | default value | description |
 | - | - | - |
