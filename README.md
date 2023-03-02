@@ -38,7 +38,7 @@ husarnet-dds singleshot
 
 On Windows, using PowerShell
 
-```shell
+```powershell
 $env:RMW_IMPLEMENTATION = 'rmw_fastrtps_cpp'
 $env:FASTRTPS_DEFAULT_PROFILES_FILE = '.\husarnet-fastdds-simple.xml'
 .\husarnet-dds.exe singleshot
@@ -97,10 +97,15 @@ sudo husarnet-dds install $USER \
 
 On Windows, using PowerShell as Administrator:
 
-```bash
-.\husarnet-dds.exe install LocalSystem -e RMW_IMPLEMENTATION=$RMW_IMPLEMENTATION \
--e FASTRTPS_DEFAULT_PROFILES_FILE=$FASTRTPS_DEFAULT_PROFILES_FILE
+```powershell
+$env:RMW_IMPLEMENTATION = 'rmw_fastrtps_cpp'
+$env:FASTRTPS_DEFAULT_PROFILES_FILE = 'C:\Users\husarnetman\Desktop\dds\husarnet-fastdds-simple.xml'
+
+.\husarnet-dds.exe install LocalSystem -e RMW_IMPLEMENTATION=$env:RMW_IMPLEMENTATION `
+-e FASTRTPS_DEFAULT_PROFILES_FILE=$env:FASTRTPS_DEFAULT_PROFILES_FILE
 ```
+
+Be sure to provide absolute path to the file which will be watched, as in the example.
 
 Available environment variables
 
@@ -118,7 +123,7 @@ Available environment variables
 sudo husarnet-dds start
 ```
 
-Now you can check the status of the service and last logs like that:
+Now you can check the status of the service on Linux and last logs like that:
 
 ```bash
 sudo systemctl status husarnet-dds.service 
@@ -127,6 +132,8 @@ sudo systemctl status husarnet-dds.service
 ```bash
 sudo journalctl --unit husarnet-dds.service -n 100 
 ```
+
+On Windows, see services.msc
 
 ### Removing
 
