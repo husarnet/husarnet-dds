@@ -303,7 +303,18 @@ func main() {
 				envvars[key] = value
 			}
 
+			options := service.KeyValue{}
+
+			if runtime.GOOS == "windows" {
+				userName = "LocalSystem"
+			}
+
+			if runtime.GOOS == "darwin" {
+				options["LogDirectory"] = "/tmp/"
+			}
+
 			fmt.Println("username:", userName)
+
 			svcConfig = &service.Config{
 				Name:        "husarnet-dds",
 				DisplayName: "Husarnet DDS Configurator",
@@ -311,6 +322,7 @@ func main() {
 				Arguments:   []string{"daemon"},
 				UserName:    userName,
 				EnvVars:     envvars,
+				Option:      options,
 			}
 			s, err := service.New(prg, svcConfig)
 
