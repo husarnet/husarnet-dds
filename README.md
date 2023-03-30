@@ -6,13 +6,28 @@ Automatically generate the DDS configuration for Husarnet.
 
 ## Installing from releases
 
+### Linux/MacOS
+
+Download the binary using `curl` or `wget`, which are available on most systems either preinstalled, or obtainable via package manager:
+
 ```bash
-RELEASE="v1.3.3"
+RELEASE="v1.3.4"
 ARCH="amd64"
 
 sudo curl -L https://github.com/husarnet/husarnet-dds/releases/download/$RELEASE/husarnet-dds-linux-$ARCH -o /usr/local/bin/husarnet-dds
 sudo chmod +x /usr/local/bin/husarnet-dds
 ```
+
+### Windows
+
+On Windows, you can download the binary via GUI from [Releases page](https://github.com/husarnet/husarnet-dds/releases) and place in directory of your liking.
+To do it right from PowerShell, use `wget` command which is an alias for `Invoke-WebRequest` cmdlet:
+
+```
+wget https://github.com/husarnet/husarnet-dds/releases/download/v1.3.4/husarnet-dds-windows-amd64.exe -OutFile husarnet-dds.exe
+```
+
+In order to be able to run the binary from any directory, place it in the directory present in your %PATH% environment variable.
 
 ## Building
 
