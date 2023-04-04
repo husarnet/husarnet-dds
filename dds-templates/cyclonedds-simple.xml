@@ -4,8 +4,7 @@
         <General>
             <NetworkInterfaceAddress>hnet0</NetworkInterfaceAddress>
             <AllowMulticast>false</AllowMulticast>
-            <MaxMessageSize>65500B</MaxMessageSize>
-            <FragmentSize>4000B</FragmentSize>
+            <FragmentSize>1194B</FragmentSize><!-- default: 1344 B minus Husarnet metadata (~150 B) -->
             <Transport>udp6</Transport>
         </General>      
         <Discovery>
