@@ -11,7 +11,7 @@ Automatically generate the DDS configuration for Husarnet.
 Download the binary using `curl` or `wget`, which are available on most systems either preinstalled, or obtainable via package manager:
 
 ```bash
-RELEASE="v1.3.4"
+RELEASE="v1.3.5"
 ARCH="amd64"
 
 sudo curl -L https://github.com/husarnet/husarnet-dds/releases/download/$RELEASE/husarnet-dds-linux-$ARCH -o /usr/local/bin/husarnet-dds
