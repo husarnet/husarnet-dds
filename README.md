@@ -11,7 +11,7 @@ Automatically generate the DDS configuration for Husarnet.
 Download the binary using `curl` or `wget`, which are available on most systems either preinstalled, or obtainable via package manager:
 
 ```bash
-RELEASE="v1.3.5"
+RELEASE="v1.3.6"
 ARCH="amd64"
 
 sudo curl -L https://github.com/husarnet/husarnet-dds/releases/download/$RELEASE/husarnet-dds-linux-$ARCH -o /usr/local/bin/husarnet-dds
@@ -126,9 +126,8 @@ Available environment variables
 
 | key | default value | description |
 | - | - | - |
-| `RMW_IMPLEMENTATION` | `rmw_fastrtps_cpp` | Choosing a default DDS implementation. Possible values `rmw_fastrtps_cpp` and `rmw_cyclonedds_cpp` |
-| `FASTRTPS_DEFAULT_PROFILES_FILE` | `/var/tmp/husarnet-dds/fastdds.xml` | path to the output `.xml` file if `RMW_IMPLEMENTATION=rmw_fastrtps_cpp` |
-| `CYCLONEDDS_URI` | `/var/tmp/husarnet-dds/cyclonedds.xml` | path to the output `.xml` file if `RMW_IMPLEMENTATION=rmw_cyclonedds_cpp` |
+| `FASTRTPS_DEFAULT_PROFILES_FILE` | `/var/tmp/husarnet-dds/fastdds.xml` | path to the output `.xml` file for `RMW_IMPLEMENTATION=rmw_fastrtps_cpp` |
+| `CYCLONEDDS_URI` | `/var/tmp/husarnet-dds/cyclonedds.xml` | path to the output `.xml` file for `RMW_IMPLEMENTATION=rmw_cyclonedds_cpp` |
 | `ROS_DISCOVERY_SERVER` | (unset) | set it ONLY for devices running in [Fast DDS Discovery Server](https://fast-dds.docs.eprosima.com/en/latest/fastdds/ros2/discovery_server/ros2_discovery_server.html) **"Client mode"**. The value of this env should have the following format: `<Husarnet-hostname-of-discovery-server>:<PORT>`, eg. `my-ds-server:11811` |
 | `DISCOVERY_SERVER_PORT` | `11811` | set it ONLY for devices running in [Fast DDS Discovery Server](https://fast-dds.docs.eprosima.com/en/latest/fastdds/ros2/discovery_server/ros2_discovery_server.html) **"Server mode"** |
 

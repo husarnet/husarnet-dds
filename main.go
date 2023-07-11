@@ -45,7 +45,7 @@ func main_loop() {
 		var output_xml_path string
 
 		myos := runtime.GOOS
-		fmt.Printf("Host OS: %s\n", myos)
+		fmt.Printf("Host OS: %s\r\n", myos)
 		switch myos {
 		case "linux":
 			husarnet_temp_dir = "/var/tmp/husarnet-dds"
@@ -82,121 +82,124 @@ func main_loop() {
 		dir := filepath.Dir(output_xml_path)
 		err := os.MkdirAll(dir, os.ModePerm)
 		if err != nil {
-			fmt.Printf("Err: can not create \"%s\" path", dir)
+			fmt.Printf("Err: can not create \"%s\" path\r\n", dir)
 			os.Exit(1)
 		}
 
 		ioutil.WriteFile(output_xml_path, []byte(output_xml), 0644)
 
-		// Check the RMW_IMPLEMENTATION env
-		rmw_implementation, ok := os.LookupEnv("RMW_IMPLEMENTATION")
+		// =========================================
+		// CYCLONE DDS CONFIG
+		// =========================================
+
+		input_xml = string(default_config_cyclonedds_simple)
+
+		// check if non-default DDS config file exists
+		if _, err := os.Stat(template_path_cyclonedds); err == nil {
+			input_xml_bytes, _ := ioutil.ReadFile(template_path_cyclonedds)
+			input_xml = string(input_xml_bytes)
+		}
+
+		// prepare XML files with Husarnet hosts
+		output_xml = ParseCycloneDDSSimple(input_xml)
+
+		// defaul output path
+		output_xml_path = husarnet_temp_dir + "/husarnet-cyclonedds.xml"
+
+		// check whether env to set non-default path is set
+		cyclonedds_uri, ok := os.LookupEnv("CYCLONEDDS_URI")
 		if ok {
-			fmt.Println("RMW_IMPLEMENTATION:", rmw_implementation)
-		} else {
-			fmt.Println("RMW_IMPLEMENTATION is not set.")
-			return
-		}
-
-		if rmw_implementation == "rmw_cyclonedds_cpp" {
-			// default config
-			input_xml = string(default_config_cyclonedds_simple)
-
-			// check if non-default DDS config file exists
-			if _, err := os.Stat(template_path_cyclonedds); err == nil {
-				input_xml_bytes, _ := ioutil.ReadFile(template_path_cyclonedds)
-				input_xml = string(input_xml_bytes)
+			fmt.Println("CYCLONEDDS_URI:", cyclonedds_uri)
+			if strings.Contains(cyclonedds_uri, "husarnet") {
+				output_xml_path = strings.Split(cyclonedds_uri, "file://")[1]
 			}
-
-			// prepare XML files with Husarnet hosts
-			output_xml = ParseCycloneDDSSimple(input_xml)
-
-			// defaul output path
-			output_xml_path = husarnet_temp_dir + "/husarnet-cyclonedds.xml"
-
-			// check whether env to set non-default path is set
-			cyclonedds_uri, ok := os.LookupEnv("CYCLONEDDS_URI")
-			if ok {
-				fmt.Println("CYCLONEDDS_URI:", cyclonedds_uri)
-				if strings.Contains(cyclonedds_uri, "husarnet") {
-					output_xml_path = strings.Split(cyclonedds_uri, "file://")[1]
-				}
-			}
-		}
-
-		if rmw_implementation == "rmw_fastrtps_cpp" {
-
-			// Load the appriopriate XML default config
-			ros_discovery_server, is_ds_client := os.LookupEnv("ROS_DISCOVERY_SERVER")
-			if is_ds_client {
-				fmt.Println("ROS_DISCOVERY_SERVER:", ros_discovery_server)
-				input_xml = string(default_config_fastdds_ds_client)
-			} else {
-				input_xml = string(default_config_fastdds_simple)
-			}
-
-			// check if non-default DDS config file exists
-			if _, err := os.Stat(template_path_fastdds_simple); err == nil {
-				input_xml_bytes, _ := ioutil.ReadFile(template_path_fastdds_simple)
-				input_xml = string(input_xml_bytes)
-			}
-
-			// prepare XML files with Husarnet hosts
-			if is_ds_client {
-				var ds_server_addr string
-				var ds_server_port string
-
-				// check whether IPv6 address is provided instead of hostname
-				ipv6 := strings.Split(ros_discovery_server, ":")
-
-				if ipv6[0] == "[fc94" {
-					// IPv6 hostname is provided
-					parts := strings.Split(ros_discovery_server, "]:")
-
-					if len(parts) == 1 {
-						fmt.Println("Error: Invalid string format")
-						os.Exit(1)
-					}
-
-					ds_server_addr = strings.Trim(parts[0], "[")
-					ds_server_port = parts[1]
-					output_xml = strings.Replace(input_xml, "$DISCOVERY_SERVER_IPV6", ds_server_addr, 1)
-				} else {
-					// normal hostname is provided
-					ds_server_addr = strings.Split(ros_discovery_server, ":")[0]
-					ds_server_port = strings.Split(ros_discovery_server, ":")[1]
-					output_xml = strings.Replace(input_xml, "$DISCOVERY_SERVER_IPV6", GetHostIPv6(ds_server_addr), 1)
-				}
-
-				output_xml = strings.Replace(output_xml, "$DISCOVERY_SERVER_PORT", ds_server_port, 1)
-				output_xml = strings.Replace(output_xml, "$HOST_IPV6", GetOwnHusarnetIPv6(), -1)
-			} else {
-				output_xml = ParseFastDDSSimple(input_xml)
-			}
-
-			// defaul output path
-			output_xml_path = husarnet_temp_dir + "/husarnet-fastdds.xml"
-
-			// check whether env to set non-default path is set
-			fastrtps_default_profiles_file, ok := os.LookupEnv("FASTRTPS_DEFAULT_PROFILES_FILE")
-			if ok {
-				fmt.Println("FASTRTPS_DEFAULT_PROFILES_FILE:", fastrtps_default_profiles_file)
-				if strings.Contains(fastrtps_default_profiles_file, "husarnet") {
-					output_xml_path = fastrtps_default_profiles_file
-				}
-			}
-
 		}
 
 		// Create necessary directories
 		dir = filepath.Dir(output_xml_path)
 		err = os.MkdirAll(dir, os.ModePerm)
 		if err != nil {
-			fmt.Printf("Err: can not create \"%s\" path", dir)
+			fmt.Printf("Err: can not create \"%s\" path\r\n", dir)
 			os.Exit(1)
 		}
 
 		ioutil.WriteFile(output_xml_path, []byte(output_xml), 0644)
-		fmt.Printf("DDS config saved here: \"%s\"", output_xml_path)
+		fmt.Printf("Cyclone DDS config saved here: \"%s\"\r\n", output_xml_path)
+
+		// =========================================
+		// FAST DDS CONFIG
+		// =========================================
+
+		// Load the appriopriate XML default config
+		ros_discovery_server, is_ds_client := os.LookupEnv("ROS_DISCOVERY_SERVER")
+		if is_ds_client {
+			fmt.Println("ROS_DISCOVERY_SERVER:", ros_discovery_server)
+			input_xml = string(default_config_fastdds_ds_client)
+		} else {
+			input_xml = string(default_config_fastdds_simple)
+		}
+
+		// check if non-default DDS config file exists
+		if _, err := os.Stat(template_path_fastdds_simple); err == nil {
+			input_xml_bytes, _ := ioutil.ReadFile(template_path_fastdds_simple)
+			input_xml = string(input_xml_bytes)
+		}
+
+		// prepare XML files with Husarnet hosts
+		if is_ds_client {
+			var ds_server_addr string
+			var ds_server_port string
+
+			// check whether IPv6 address is provided instead of hostname
+			ipv6 := strings.Split(ros_discovery_server, ":")
+
+			if ipv6[0] == "[fc94" {
+				// IPv6 hostname is provided
+				parts := strings.Split(ros_discovery_server, "]:")
+
+				if len(parts) == 1 {
+					fmt.Println("Error: Invalid string format")
+					os.Exit(1)
+				}
+
+				ds_server_addr = strings.Trim(parts[0], "[")
+				ds_server_port = parts[1]
+				output_xml = strings.Replace(input_xml, "$DISCOVERY_SERVER_IPV6", ds_server_addr, 1)
+			} else {
+				// normal hostname is provided
+				ds_server_addr = strings.Split(ros_discovery_server, ":")[0]
+				ds_server_port = strings.Split(ros_discovery_server, ":")[1]
+				output_xml = strings.Replace(input_xml, "$DISCOVERY_SERVER_IPV6", GetHostIPv6(ds_server_addr), 1)
+			}
+
+			output_xml = strings.Replace(output_xml, "$DISCOVERY_SERVER_PORT", ds_server_port, 1)
+			output_xml = strings.Replace(output_xml, "$HOST_IPV6", GetOwnHusarnetIPv6(), -1)
+		} else {
+			output_xml = ParseFastDDSSimple(input_xml)
+		}
+
+		// defaul output path
+		output_xml_path = husarnet_temp_dir + "/husarnet-fastdds.xml"
+
+		// check whether env to set non-default path is set
+		fastrtps_default_profiles_file, ok := os.LookupEnv("FASTRTPS_DEFAULT_PROFILES_FILE")
+		if ok {
+			fmt.Println("FASTRTPS_DEFAULT_PROFILES_FILE:", fastrtps_default_profiles_file)
+			if strings.Contains(fastrtps_default_profiles_file, "husarnet") {
+				output_xml_path = fastrtps_default_profiles_file
+			}
+		}
+
+		// Create necessary directories
+		dir = filepath.Dir(output_xml_path)
+		err = os.MkdirAll(dir, os.ModePerm)
+		if err != nil {
+			fmt.Printf("Err: can not create \"%s\" path\r\n", dir)
+			os.Exit(1)
+		}
+
+		ioutil.WriteFile(output_xml_path, []byte(output_xml), 0644)
+		fmt.Printf("Fast DDS config saved here: \"%s\"\r\n", output_xml_path)
 	} else {
 		fmt.Println("can't reach Husarnet client API")
 		os.Exit(1)
@@ -296,7 +299,7 @@ func main() {
 			envvars := make(map[string]string)
 
 			for i, env := range envs {
-				fmt.Printf("env[%d]: %s\n", i, env)
+				fmt.Printf("env[%d]: %s\r\n", i, env)
 				key := strings.Split(env, "=")[0]
 				value := strings.Split(env, "=")[1]
 
@@ -340,7 +343,7 @@ func main() {
 
 	installCommand.Flags().StringArrayVarP(&envs, "env", "e",
 		[]string{
-			"RMW_IMPLEMENTATION=rmw_fastrtps_cpp",
+			"CYCLONEDDS_URI=file://" + husarnet_temp_dir + "/cyclonedds.xml",
 			"FASTRTPS_DEFAULT_PROFILES_FILE=" + husarnet_temp_dir + "/fastdds.xml"},
 		"environment variables for the service")
 
