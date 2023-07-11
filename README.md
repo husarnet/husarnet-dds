@@ -127,7 +127,7 @@ Available environment variables
 | key | default value | description |
 | - | - | - |
 | `FASTRTPS_DEFAULT_PROFILES_FILE` | `/var/tmp/husarnet-dds/fastdds.xml` | path to the output `.xml` file for `RMW_IMPLEMENTATION=rmw_fastrtps_cpp` |
-| `CYCLONEDDS_URI` | `/var/tmp/husarnet-dds/cyclonedds.xml` | path to the output `.xml` file for `RMW_IMPLEMENTATION=rmw_cyclonedds_cpp` |
+| `CYCLONEDDS_URI` | `file:///var/tmp/husarnet-dds/cyclonedds.xml` | path to the output `.xml` file for `RMW_IMPLEMENTATION=rmw_cyclonedds_cpp` |
 | `ROS_DISCOVERY_SERVER` | (unset) | set it ONLY for devices running in [Fast DDS Discovery Server](https://fast-dds.docs.eprosima.com/en/latest/fastdds/ros2/discovery_server/ros2_discovery_server.html) **"Client mode"**. The value of this env should have the following format: `<Husarnet-hostname-of-discovery-server>:<PORT>`, eg. `my-ds-server:11811` |
 | `DISCOVERY_SERVER_PORT` | `11811` | set it ONLY for devices running in [Fast DDS Discovery Server](https://fast-dds.docs.eprosima.com/en/latest/fastdds/ros2/discovery_server/ros2_discovery_server.html) **"Server mode"** |
 
